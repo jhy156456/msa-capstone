@@ -1,0 +1,46 @@
+tasks:
+  - name: httpie
+    command: pip install httpie
+
+  - name: siege
+    command: >
+      sudo apt-get install siege &&
+      siege -V
+    
+  - name: kafka
+    command: > 
+      cd kafka &&
+      docker-compose up -d
+  - name: kubectl
+    command: >
+      curl -LO https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl &&
+      sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl &&
+      kubectl version --client &&
+      gp sync-done init-kubectl
+      
+  - name: python
+    init: gp sync-await init-kubectl
+    command: >
+      sudo apt install python-is-python3 &&
+      gp sync-done init-python
+      
+  - name: awscli
+    init: gp sync-await init-python
+    command: >
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
+      unzip awscliv2.zip &&
+      sudo ./aws/install &&
+      gp sync-done init-awscli
+    
+  - name: eksctl
+    init: gp sync-await init-awscli
+    command: >
+      curl --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp &&
+      sudo mv /tmp/eksctl /usr/local/bin &&
+      eksctl version &&
+      gp sync-done init-eksctl
+      
+  - name: boot
+    init: gp sync-await init-eksctl
+    command: >
+      cat ./config/init

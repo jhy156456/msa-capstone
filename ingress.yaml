@@ -1,0 +1,29 @@
+apiVersion: "extensions/v1beta1"
+kind: "Ingress"
+metadata: 
+  name: "shopping-ingress"
+  annotations: 
+    kubernetes.io/ingress.class: "nginx"
+spec: 
+  rules: 
+    - 
+      http: 
+        paths: 
+          - 
+            path: /schedules
+            pathType: Prefix
+            backend: 
+              serviceName: schedule
+              servicePort: 8080
+          - 
+            path: /communications
+            pathType: Prefix
+            backend: 
+              serviceName: communication
+              servicePort: 8080
+          - 
+            path: /messages
+            pathType: Prefix
+            backend: 
+              serviceName: message
+              servicePort: 8080
