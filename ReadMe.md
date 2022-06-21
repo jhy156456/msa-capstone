@@ -1,6 +1,7 @@
 # 분석설계
 
 #### 기능적 요구사항
+
 - 호스트가 데이트 코스를 등록/수정/삭제한다.
 - 고객이 데이트 코스에 대한 내용을 확인할 수 있다.
 - 고객이 데이트 코스를 선택하여 북마크한다
@@ -13,6 +14,7 @@
 - 전체적인 데이트 코스에 대한 정보 및 후기 상태 등을 한 화면에서 확인 할 수 있다.(viewpage)
 
 #### 비기능적 요구사항
+
 - 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
 - 리뷰 작성 시 리뷰 작성이 가능한지 확인한다
 - 고객이 코스(schedule) 상태를 시스템에서 확인할 수 있어야 한다 (CQRS)
@@ -61,6 +63,7 @@ mvn spring-boot:run
 ```
 
 4개의 도메인으로 관리되고 있으며 코스관리(Schedule), 소통(Communication), 후기(Review), 코스조회(Viewpage)으로 구성된다.
+
 ```
 @Entity
 @Table(name = "Schedule_table")
@@ -287,6 +290,29 @@ kubectl create deploy review --image=004814395703.dkr.ecr.ap-northeast-2.amazona
 kubectl expose deploy review --port=8080
 ```
 
+## 인그레스를 통한 진입점 
+
+```shell
+NAME               CLASS    HOSTS   ADDRESS                                                                      PORTS   AGE
+shopping-ingress   <none>   *       a9fa41398230441f9be95fd1a3f475a0-1369196697.ca-central-1.elb.amazonaws.com   80      48m
+
+```
+
+## 서비스 목록 확인
+
+```shell
+NAME         TYPE           CLUSTER-IP       EXTERNAL-IP                                                                  PORT(S)          AGE
+gateway      LoadBalancer   10.100.222.60    a4b2d3d20b7a74c0fa24ff77e4b57ae1-1516662203.ca-central-1.elb.amazonaws.com   8080:31625/TCP   4m11s
+kubernetes   ClusterIP      10.100.0.1       <none>                                                                       443/TCP          89m
+schedule     ClusterIP      10.100.248.206   <none>                                                                       8080/TCP         61s
+```
+
+## 외부에서 서버 접속 확인
+
+<img src="./image/deploy.png"></img><br/>
+
+
+
 각 구현체 파드들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 AWS의 EKS를 사용하였다.
 파드들은 패키지화 하여 도커 이미지 빌드 후에 배포하였고 Dockerfile에 저장되어있는 형태로 도커라이징 하여 쿠버네티스 클러스터에 배포하였다.
 pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 포함되었다.
@@ -300,7 +326,38 @@ pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 �
 
 # Autoscale(HPA)
 
+## 생성된 siege Pod 안쪽에서 정상 작동 확인
 
+```shell
+** Preparing 1 concurrent users for battle.
+The server is now under siege...
+HTTP/1.1 200     0.03 secs:     438 bytes ==> GET  /schedules
+HTTP/1.1 200     0.03 secs:     438 bytes ==> GET  /schedules
+HTTP/1.1 200     0.03 secs:     438 bytes ==> GET  /schedules
+HTTP/1.1 200     0.01 secs:     438 bytes ==> GET  /schedules
+```
+
+
+
+오토 스케일링 설정명령어 호출
+
+```shell
+kubectl autoscale deployment schedule --cpu-percent=20 --min=1 --max=3
+```
+
+설정값 확인
+
+```shell
+gitpod /workspace/msa-capstone (main) $ kubectl get hpa
+NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+schedule   Deployment/schedule   <unknown>/20%   1         3         1          48s
+```
+
+
+
+## 오토스케일 정상 작동 확인
+
+<img src="./image/auto_scale.png"></img><br/>
 
 
 
