@@ -1,70 +1,97 @@
 # 분석설계
 
+#### 기능적 요구사항
 - 호스트가 데이트 코스를 등록/수정/삭제한다.
 - 고객이 데이트 코스에 대한 내용을 확인할 수 있다.
-
 - 고객이 데이트 코스를 선택하여 북마크한다
 - 고객이 마음에 드는 데이트 코스를 선택하여 좋아요(like)를 누른다.
-
 - 고객이 좋아요(like)를 취소할 수 있다.
 - 북마크가 되면 북마크한 내역(Message)이 전달된다.
-
 - 고객이 북마크를 취소할 수 있다.
-
 - 북마크가 취소될 경우 취소 내역(Message)이 전달된다.
-
 - 고객이 데이트 코스에 대한 후기(review)를 남길 수 있다.
-
 - 전체적인 데이트 코스에 대한 정보 및 후기 상태 등을 한 화면에서 확인 할 수 있다.(viewpage)
+
+#### 비기능적 요구사항
+- 마이크로 서비스를 넘나드는 시나리오에 대한 트랜잭션 처리
+- 리뷰 작성 시 리뷰 작성이 가능한지 확인한다
+- 고객이 코스(schedule) 상태를 시스템에서 확인할 수 있어야 한다 (CQRS)
+
+
+### Event storming 결과
+
+<img src="./image/EventStorming.PNG"></img><br/>
+
+
+### 기능적, 비기능적 요구사항 검토
+
+<img src="./image/EventStorming_1.PNG"></img><br/>
+
+
+### 헥사고날 아키텍쳐 도출
+
+<img src="./image/Hexagonal.PNG"></img><br/>
+
+
 
 # SAGA Pattern
 
 ## 구현
 
 서비스를 아래와 같은 방법으로 개별적으로 실행한다.
-<<<<<<< HEAD
 
 ```java
-$ cd schedule
-$ mvn spring-boot:run
-```
-
-```java
-$ cd communication
-$ mvn spring-boot:run
+cd schedule
+mvn spring-boot:run
 ```
 
 ```java
-$ cd review
-$ mvn spring-boot:run
+cd communication
+mvn spring-boot:run
 ```
 
 ```java
-$ cd viewpage
-$ mvn spring-boot:run
+cd review
+mvn spring-boot:run
 ```
 
-
-=======
+```java
+cd viewpage
+mvn spring-boot:run
 ```
-$ cd schedule
-$ mvn spring-boot:run
-```
-```
-$ cd communication
-$ mvn spring-boot:run
-```
-```
-$ cd review
-$ mvn spring-boot:run
-```
-```
-$ cd viewpage
-$ mvn spring-boot:run
-```
->>>>>>> 314ad586b7dcbe08bc765a909e83daedaa75e6ec
 
 4개의 도메인으로 관리되고 있으며 코스관리(Schedule), 소통(Communication), 후기(Review), 코스조회(Viewpage)으로 구성된다.
+```
+@Entity
+@Table(name = "Schedule_table")
+@Data
+public class Schedule {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String title;
+    private String content;
+    private String uploader;
+    private Integer commentCnt;
+    private Long bookmarkCnt;
+    private Integer likeCnt;
+    private Boolean reviewWriteYn;
+    private Integer reviewCnt;
+
+    @PostPersist
+    public void onPostPersist() {
+        ScheduleRegistered scheduleRegistered = new ScheduleRegistered(this);
+        scheduleRegistered.publishAfterCommit();
+
+        ScheduleModified scheduleModified = new ScheduleModified(this);
+        scheduleModified.publishAfterCommit();
+
+        ScheduleDeleted scheduleDeleted = new ScheduleDeleted(this);
+        scheduleDeleted.publishAfterCommit();
+    }
+...    
+```
 
 # CQRS Pattern
 
@@ -118,16 +145,17 @@ SNS Project에서는 PolicyHandler에서 처리 시 어떤 건에 대한 처리�
 2) interface를 작성하고 annotation을 붙여주면 세부적인 내용 없이 사용할 수 있기 때문에 ***\*코드 복잡도가 낮아집니다.\****
 3) ***\*Netflix\**** 에서 만들어졌고, ***\*spring-cloud-starter-openfeign\**** 으로 스프링 라이브러리에서 사용할 수 있습니다.
 
-
 # Gateway
 
 **1) gateway 서비스 포트 8080으로 지정**
+
 ```
 server:
   port: 8088
 ```
 
 **2) 설정 파일(application.yaml) 내 각 마이크로 서비스 route 추가**
+
 ```
 spring:
   profiles: docker
@@ -171,6 +199,7 @@ spring:
 ```
 
 **3) Kubernetes Deployment.yaml 작성**
+
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -196,11 +225,13 @@ spec:
 ```
 
 **4) Deploy**
+
 ```
 $ kubectl apply -f deployment.yaml
 ```
 
 **5) Kubernetes용 Service.yaml 작성**
+
 ```
 apiVersion: v1
 kind: Service
@@ -218,11 +249,11 @@ spec:
 ```
 
 **6) Service/LoadBalancer 생성하여 Gateway end point 확인**
+
 ```
 $ kubectl apply -f service.yaml
 $ kubectl get svc -n schedule
 ```
-
 
 # Deploy / Pipeline
 
