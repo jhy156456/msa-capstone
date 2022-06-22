@@ -371,9 +371,16 @@ exit
 
 # Self-Healing(Liveness Probe)
 
+호출 명령어
 
+```shell
+kubectl exec -it siege -- /bin/bash
+http http://a9fa41398230441f9be95fd1a3f475a0-1369196697.ca-central-1.elb.amazonaws.com/schedules/callMemleak
+```
 
+종료후 재시작 확인
 
+<img src="./image/liveness.png"></img><br/>
 
 # Zero-Downtime Deploy(Readiness Probe)
 
@@ -393,6 +400,24 @@ Successful transactions:         978
 ```
 
 
+
+호출명령어
+
+```shell
+kubectl exec -it siege -- /bin/bash
+siege -c1 -t60S -v http://a9fa41398230441f9be95fd1a3f475a0-1369196697.ca-central-1.elb.amazonaws.com/schedules
+ --delay=1S
+```
+
+```shell
+kubectl apply -f kubernetes/deployment.yaml
+```
+
+
+
+무중단배포 확인
+
+<img src="./image/readiness.png"></img><br/>
 
 
 

@@ -16,17 +16,17 @@ spec:
     spec:
       containers:
         - name: schedule
-          image: 004814395703.dkr.ecr.ca-central-1.amazonaws.com/schedule:v1
+          image: 004814395703.dkr.ecr.ca-central-1.amazonaws.com/schedule:memleak
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
+          # readinessProbe:
+          #   httpGet:
+          #     path: '/actuator/health'
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   timeoutSeconds: 2
+          #   periodSeconds: 5
+          #   failureThreshold: 10
           # livenessProbe:
           #   httpGet:
           #     path: '/actuator/health'
