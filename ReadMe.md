@@ -164,7 +164,7 @@ mvn spring-boot:run
 
 * view의 Query Model을 통해 코스(schedule)를 통합조회 Query Model 은 발생한 모든 이벤트를 수신하여 자신만의 View로 데이터를 통합 조회 가능하게 함
 ```
-http localhost:8083/scheduleViews/schedules/1
+http localhost:8083/scheduleViews/1
 ```
 ```
 HTTP/1.1 200 OK
@@ -179,10 +179,10 @@ x-envoy-upstream-service-time: 10
 {
     "_links": {
         "schedule": {
-            "href": "http://localhost:8083/scheduleViews/schedules/1"
+            "href": "http://localhost:8083/scheduleViews/1"
         },
         "self": {
-            "href": "http://localhost:8083/scheduleViews/schedules/1"
+            "href": "http://localhost:8083/scheduleViews/1"
         }
     },
     "bookmarkCnt": null,
