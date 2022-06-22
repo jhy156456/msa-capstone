@@ -595,7 +595,7 @@ mysql> show databases;
 
 ```
 
-6. 주문 생성
+6. 코스(schedule)  생성
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules title="DBTest" content="testtest"
 HTTP/1.1 201 Created
@@ -634,7 +634,7 @@ kubectl delete pod mysql
 kubectl apply -f 4.deployment.yaml
 ```
 
-8.mysql 삭제 후 재실행 하기 전 오더 존재 확인
+8.mysql 삭제 후 재실행 하기 전 코스(schedule) 존재 확인
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1
 HTTP/1.1 200 OK
