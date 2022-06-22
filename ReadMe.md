@@ -1,3 +1,19 @@
+# 평가항목
+
+- 분석설계 : 팀원모두
+- SAGA : 탁미정
+- CQRS : 백승진
+- Correlation / Compensation : 정현영
+- Req / Resp : 이진현
+- Gateway : 탁미정
+- Deploy / Pipeline : 백승진
+- Circuit Breaker : 정현영
+- Autoscale(HPA) : 이진현
+- Self-healing(Liveness Probe) : 탁미정
+- Zero-downtime deploy(Readiness Probe) : 백승진
+- Config Map / Persistence Volume : 정현영
+- Polyglot : 이진현
+
 # 분석설계
 
 #### 기능적 요구사항
@@ -36,7 +52,7 @@
 
 
 
-# SAGA Pattern
+# SAGA Pattern - 탁미정
 
 ## 구현
 
@@ -762,7 +778,7 @@ x-envoy-upstream-service-time: 5
 }
 
 ```
- 
+
 # Polyglot
 
  message 파드를 파이썬으로 빌드하여 배포해본다.
