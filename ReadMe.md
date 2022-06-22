@@ -452,6 +452,93 @@ data:
   password: YWRtaW4=     
 ```
 
+3. mysql 설치를 위한 pod 정보 추가 및  pvc, secret 적용
+```
+deployment.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    name: lbl-k8s-mysql
+spec:
+  containers:
+  - name: mysql
+    image: mysql:latest
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-pass
+          key: password
+    ports:
+    - name: mysql
+      containerPort: 3306
+      protocol: TCP
+    volumeMounts:
+    - name: k8s-mysql-storage
+      mountPath: /var/lib/mysql
+  volumes:
+  - name: k8s-mysql-storage
+    persistentVolumeClaim:
+      claimName: "fs"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedule
+  labels:
+    app: schedule
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schedule
+  template:
+    metadata:
+      labels:
+        app: schedule
+    spec:
+      containers:
+        - name: schedule
+          image: 004814395703.dkr.ecr.ca-central-1.amazonaws.com/schedule:v1
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/schedules'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/schedules'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+          env:
+            - name: superuser.userId
+              value: userId
+            - name: _DATASOURCE_ADDRESS
+              value: mysql
+            - name: _DATASOURCE_TABLESPACE
+              value: orderdb
+            - name: _DATASOURCE_USERNAME
+              value: root
+            - name: _DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password  
+```
+
 
 
 
