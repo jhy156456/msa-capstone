@@ -443,6 +443,8 @@ spec:
 
 2. DB접속 시 보안을 위한 secret 정보 생성 
 ```
+deployment.yaml
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -452,7 +454,7 @@ data:
   password: YWRtaW4=     
 ```
 
-3. mysql 설치를 위한 pod 정보 추가 및  pvc, secret 적용
+3. mysql 설치를 위한 pod 정보 추가 및  pvc, secret 적용 (mysql은 docker hub의 최신 버전)
 ```
 deployment.yaml
 ---
@@ -539,7 +541,28 @@ spec:
                   key: password  
 ```
 
-4. mysql db 활성화
+4. 변경된 사항을 반영하기 위해 deployment.yaml apply 실행 및 확인 
+```
+kubectl apply -f deployment.yaml
+```
+```
+-- pod 생성 정보 확인
+gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+message-5cb67558c4-47hc6         2/2     Running   0          14m
+mysql                            2/2     Running   0          26m
+schedule-79cb59f8b-mc6b7         2/2     Running   0          71m
+schedule-istio-6dbcd6ffd-fndpx   2/2     Running   0          69m
+siege                            1/1     Running   0          22h
+
+-- secret 생성 확인
+gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl get secrets
+NAME                  TYPE                                  DATA   AGE
+default-token-lmqn7   kubernetes.io/service-account-token   3      2d
+mysql-pass            Opaque                                1      75m
+```
+
+5. mysql db 활성화
 ```
 gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl exec mysql -it -- bash
 root@mysql:/# mysql --user=root --password=$MYSQL_ROOT_PASSWORD
@@ -572,7 +595,7 @@ mysql> show databases;
 
 ```
 
-5. 주문 생성
+6. 주문 생성
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules title="DBTest" content="testtest"
 HTTP/1.1 201 Created
@@ -605,13 +628,13 @@ x-envoy-upstream-service-time: 218
 }
 ```
 
-6.mysql pod 삭제 후 재실행
+7.mysql pod 삭제 후 재실행
 ```
 kubectl delete pod mysql
 kubectl apply -f 4.deployment.yaml
 ```
 
-7.mysql 삭제 후 재실행 하기 전 오더 존재 확인
+8.mysql 삭제 후 재실행 하기 전 오더 존재 확인
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1
 HTTP/1.1 200 OK
