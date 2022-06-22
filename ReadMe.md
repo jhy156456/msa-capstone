@@ -112,8 +112,89 @@ public class Schedule {
 
 - 비동기식으로 처리되어 발행된 이벤트 기반 Kafka 를 통해 수신/처리 되어 별도 Table 에 관리한다
 
-Table 모델링 (ROOMVIEW)
+* Schedule 등록
+```
+gitpod /workspace/msa-capstone-project (main) $ http POST :8082/schedules title="test" content="여의도" uploader="tester" reviewWriteYn = true
+```
 
+```
+HTTP/1.1 201 Created
+Connection: keep-alive
+Content-Type: application/json
+Date: Wed, 22 Jun 2022 04:52:26 GMT
+Transfer-Encoding: chunked
+location: http://localhost:8082/schedules/1
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-envoy-decorator-operation: schedule.default.svc.cluster.local:8080/*
+x-envoy-upstream-service-time: 218
+
+{
+    "_links": {
+        "schedule": {
+            "href": "http://localhost:8082/schedules/1"
+        },
+        "self": {
+            "href": "localhost:8082/schedules/1"
+        }
+    },
+    "bookmarkCnt": null,
+    "commentCnt": null,
+    "content": "여의도",
+    "likeCnt": null,
+    "reviewCnt": null,
+    "reviewWriteYn": true,
+    "title": "test",
+    "uploader": "tester"
+}
+```
+
+* 카프카 consumer 이벤트 모니터링
+```
+/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic shopmall --from-beginning
+```
+```
+{"eventType":"ScheduleResistered","timestamp":"20220621104951","id":1,"title":"test", "content":"여의도", uploader:"tester","commentCnt":null,"bookmarkCnt":null,"bookmarkCnt":null,"likeCnt":null, "reviewWriteYn":true, "reviewCnt":null}
+```
+
+* viewpage 서비스를 실행
+```
+cd viewpage
+mvn spring-boot:run
+```
+
+* view의 Query Model을 통해 코스(schedule)를 통합조회 Query Model 은 발생한 모든 이벤트를 수신하여 자신만의 View로 데이터를 통합 조회 가능하게 함
+```
+http localhost:8083/scheduleViews/schedules/1
+```
+```
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Type: application/hal+json
+Date: Wed, 22 Jun 2022 04:52:54 GMT
+Transfer-Encoding: chunked
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-envoy-decorator-operation: schedule.default.svc.cluster.local:8080/*
+x-envoy-upstream-service-time: 10
+
+{
+    "_links": {
+        "schedule": {
+            "href": "http://localhost:8083/scheduleViews/schedules/1"
+        },
+        "self": {
+            "href": "http://localhost:8083/scheduleViews/schedules/1"
+        }
+    },
+    "bookmarkCnt": null,
+    "commentCnt": null,
+    "content": "여의도",
+    "likeCnt": null,
+    "reviewCnt": null,
+    "reviewWriteYn": true,
+    "title": "test",
+    "uploader": "tester"
+}
+```
 
 
 # Correlation / Compensation(Unique Key)
