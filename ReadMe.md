@@ -353,6 +353,14 @@ NAME       REFERENCE             TARGETS         MINPODS   MAXPODS   REPLICAS   
 schedule   Deployment/schedule   <unknown>/20%   1         3         1          48s
 ```
 
+부하 명령어 확인
+
+```shell
+kubectl exec -it siege -- /bin/bash
+siege -c20 -t40S -v http://a9fa41398230441f9be95fd1a3f475a0-1369196697.ca-central-1.elb.amazonaws.com/schedules
+exit
+```
+
 
 
 ## 오토스케일 정상 작동 확인
@@ -368,6 +376,21 @@ schedule   Deployment/schedule   <unknown>/20%   1         3         1          
 
 
 # Zero-Downtime Deploy(Readiness Probe)
+
+정지시간 발생 확인
+
+```shell
+Lifting the server siege...
+Transactions:                    978 hits
+Availability:                  71.18 %
+Elapsed time:                  23.52 secs
+Data transferred:               0.44 MB
+Response time:                  0.02 secs
+Transaction rate:              41.58 trans/sec
+Throughput:                     0.02 MB/sec
+Concurrency:                    0.98
+Successful transactions:         978
+```
 
 
 

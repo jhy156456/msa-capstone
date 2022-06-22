@@ -14,7 +14,7 @@ spec:
             pathType: Prefix
             backend: 
               serviceName: schedule
-              servicePort: 8081
+              servicePort: 8080
           - 
             path: /communications
             pathType: Prefix

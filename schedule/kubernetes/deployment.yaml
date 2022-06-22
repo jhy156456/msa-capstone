@@ -19,17 +19,14 @@ spec:
           image: 004814395703.dkr.ecr.ca-central-1.amazonaws.com/schedule:v1
           ports:
             - containerPort: 8080
-          resources:
-            requests:
-              cpu: "200m"
-          # readinessProbe:
-          #   httpGet:
-          #     path: '/actuator/health'
-          #     port: 8080
-          #   initialDelaySeconds: 10
-          #   timeoutSeconds: 2
-          #   periodSeconds: 5
-          #   failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
           # livenessProbe:
           #   httpGet:
           #     path: '/actuator/health'
