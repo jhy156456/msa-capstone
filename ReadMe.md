@@ -423,6 +423,34 @@ kubectl apply -f kubernetes/deployment.yaml
 
 # Config Map / Persistence Volume
 
+1. PersistenceVolume 으로 된 파일시스템을 사용하기 위해 fs라는 pvc 생성
+```
+pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fs
+  labels:
+    app: test-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Mi
+```
+
+2. DB접속 시 보안을 위한 secret 정보 생성 
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+type: Opaque
+data:
+  password: YWRtaW4=     
+```
 
 
 
