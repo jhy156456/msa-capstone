@@ -539,7 +539,109 @@ spec:
                   key: password  
 ```
 
+4. mysql db 활성화
+```
+gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl exec mysql -it -- bash
+root@mysql:/# mysql --user=root --password=$MYSQL_ROOT_PASSWORD
+mysql> show databases
+    -> ;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
 
+mysql> create database scheduledb;
+Query OK, 1 row affected (0.00 sec)
 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| scheduledb         |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+```
+
+5. 주문 생성
+```
+gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules title="DBTest" content="testtest"
+HTTP/1.1 201 Created
+Connection: keep-alive
+Content-Type: application/json
+Date: Wed, 22 Jun 2022 04:52:26 GMT
+Transfer-Encoding: chunked
+location: http://acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-envoy-decorator-operation: schedule.default.svc.cluster.local:8080/*
+x-envoy-upstream-service-time: 218
+
+{
+    "_links": {
+        "schedule": {
+            "href": "http://acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1"
+        },
+        "self": {
+            "href": "http://acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1"
+        }
+    },
+    "bookmarkCnt": null,
+    "commentCnt": null,
+    "content": "testtest",
+    "likeCnt": null,
+    "reviewCnt": null,
+    "reviewWriteYn": null,
+    "title": "DBTest",
+    "uploader": null
+}
+```
+
+6.mysql pod 삭제 후 재실행
+```
+kubectl delete pod mysql
+kubectl apply -f 4.deployment.yaml
+```
+
+7.mysql 삭제 후 재실행 하기 전 오더 존재 확인
+```
+gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Type: application/hal+json
+Date: Wed, 22 Jun 2022 04:55:15 GMT
+Transfer-Encoding: chunked
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-envoy-decorator-operation: schedule.default.svc.cluster.local:8080/*
+x-envoy-upstream-service-time: 5
+
+{
+    "_links": {
+        "schedule": {
+            "href": "http://acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1"
+        },
+        "self": {
+            "href": "http://acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1"
+        }
+    },
+    "bookmarkCnt": null,
+    "commentCnt": null,
+    "content": "testtest",
+    "likeCnt": null,
+    "reviewCnt": null,
+    "reviewWriteYn": null,
+    "title": "DBTest",
+    "uploader": null
+}
+
+```
 
 # Polyglot
