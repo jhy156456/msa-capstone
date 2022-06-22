@@ -52,11 +52,11 @@ public class Review {
 
 
 
-        ReviewModified reviewModified = new ReviewModified(this);
-        reviewModified.publishAfterCommit();
+        // ReviewModified reviewModified = new ReviewModified(this);
+        // reviewModified.publishAfterCommit();
 
-        ReviewDeleted reviewDeleted = new ReviewDeleted(this);
-        reviewDeleted.publishAfterCommit();
+        // ReviewDeleted reviewDeleted = new ReviewDeleted(this);
+        // reviewDeleted.publishAfterCommit();
     }
 
     public static ReviewRepository repository() {

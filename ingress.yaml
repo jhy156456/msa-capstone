@@ -16,6 +16,12 @@ spec:
               serviceName: schedule
               servicePort: 8080
           - 
+            path: /schedule-istios
+            pathType: Prefix
+            backend: 
+              serviceName: schedule-istio
+              servicePort: 8080
+          - 
             path: /communications
             pathType: Prefix
             backend: 
@@ -26,4 +32,10 @@ spec:
             pathType: Prefix
             backend: 
               serviceName: message
+              servicePort: 8080
+          - 
+            path: /reviews
+            pathType: Prefix
+            backend: 
+              serviceName: review
               servicePort: 8080

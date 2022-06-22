@@ -113,6 +113,7 @@ public class Schedule {
 - 비동기식으로 처리되어 발행된 이벤트 기반 Kafka 를 통해 수신/처리 되어 별도 Table 에 관리한다
 
 * Schedule 등록
+
 ```
 gitpod /workspace/msa-capstone-project (main) $ http POST :8082/schedules title="test" content="여의도" uploader="tester" reviewWriteYn = true
 ```
@@ -149,23 +150,28 @@ x-envoy-upstream-service-time: 218
 ```
 
 * 카프카 consumer 이벤트 모니터링
+
 ```
 /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic shopmall --from-beginning
 ```
+
 ```
 {"eventType":"ScheduleResistered","timestamp":"20220621104951","id":1,"title":"test", "content":"여의도", uploader:"tester","commentCnt":null,"bookmarkCnt":null,"bookmarkCnt":null,"likeCnt":null, "reviewWriteYn":true, "reviewCnt":null}
 ```
 
 * viewpage 서비스를 실행
+
 ```
 cd viewpage
 mvn spring-boot:run
 ```
 
 * view의 Query Model을 통해 코스(schedule)를 통합조회 Query Model 은 발생한 모든 이벤트를 수신하여 자신만의 View로 데이터를 통합 조회 가능하게 함
+
 ```
 http localhost:8083/scheduleViews/1
 ```
+
 ```
 HTTP/1.1 200 OK
 Connection: keep-alive
@@ -505,6 +511,7 @@ kubectl apply -f kubernetes/deployment.yaml
 # Config Map / Persistence Volume
 
 1. PersistenceVolume 으로 된 파일시스템을 사용하기 위해 fs라는 pvc 생성
+
 ```
 pvc.yaml
 
@@ -523,6 +530,7 @@ spec:
 ```
 
 2. DB접속 시 보안을 위한 secret 정보 생성 
+
 ```
 deployment.yaml
 ---
@@ -536,6 +544,7 @@ data:
 ```
 
 3. mysql 설치를 위한 pod 정보 추가 및  pvc, secret 적용 (mysql은 docker hub의 최신 버전)
+
 ```
 deployment.yaml
 ---
@@ -623,9 +632,11 @@ spec:
 ```
 
 4. 변경된 사항을 반영하기 위해 deployment.yaml apply 실행 및 확인 
+
 ```
 kubectl apply -f deployment.yaml
 ```
+
 ```
 -- pod 생성 정보 확인
 gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl get pods
@@ -644,6 +655,7 @@ mysql-pass            Opaque                                1      75m
 ```
 
 5. mysql db 활성화
+
 ```
 gitpod /workspace/msa-capstone/schedule/kubernetes (main) $ kubectl exec mysql -it -- bash
 root@mysql:/# mysql --user=root --password=$MYSQL_ROOT_PASSWORD
@@ -677,6 +689,7 @@ mysql> show databases;
 ```
 
 6. 코스(schedule)  생성
+
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules title="DBTest" content="testtest"
 HTTP/1.1 201 Created
@@ -710,12 +723,14 @@ x-envoy-upstream-service-time: 218
 ```
 
 7.mysql pod 삭제 후 재실행
+
 ```
 kubectl delete pod mysql
 kubectl apply -f 4.deployment.yaml
 ```
 
 8.mysql 삭제 후 재실행 하기 전 코스(schedule) 존재 확인
+
 ```
 gitpod /workspace/msa-capstone/schedule (main) $ http acfb969d1926a46a98fb8847915140c3-1081140102.ca-central-1.elb.amazonaws.com/schedules/1
 HTTP/1.1 200 OK
@@ -749,3 +764,11 @@ x-envoy-upstream-service-time: 5
 ```
 
 # Polyglot
+
+ message 파드를 파이썬으로 빌드하여 배포해본다.
+
+<img src="./image/poly_1.png"></img><br/>
+
+클러스터에 도커이미지 배포 후 호출
+
+<img src="./image/poly_2.png"></img><br/>
