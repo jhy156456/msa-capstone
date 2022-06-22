@@ -121,7 +121,7 @@ gitpod /workspace/msa-capstone-project (main) $ http POST :8082/schedules title=
 HTTP/1.1 201 Created
 Connection: keep-alive
 Content-Type: application/json
-Date: Wed, 22 Jun 2022 04:52:26 GMT
+Date: Tue, 21 Jun 2022 04:52:26 GMT
 Transfer-Encoding: chunked
 location: http://localhost:8082/schedules/1
 vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
@@ -170,7 +170,7 @@ http localhost:8083/scheduleViews/1
 HTTP/1.1 200 OK
 Connection: keep-alive
 Content-Type: application/hal+json
-Date: Wed, 22 Jun 2022 04:52:54 GMT
+Date: Tue, 21 Jun 2022 04:52:54 GMT
 Transfer-Encoding: chunked
 vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
 x-envoy-decorator-operation: schedule.default.svc.cluster.local:8080/*
